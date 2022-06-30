@@ -8,12 +8,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Fetch cache
-        uses: actions/cache@v1
-        with:
-          path: /home/runner/cache/
-          key: deploy-cache
-
       - name: Install bazelisk
         run: |
           curl -LO "https://github.com/bazelbuild/bazelisk/releases/download/v1.12.0/bazelisk-linux-amd64"
