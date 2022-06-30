@@ -40,3 +40,4 @@ build:ci --repository_cache=/home/runner/cache/bazel/
 build:ci --flaky_test_attempts=2
 build:ci --color=yes
 build:ci --disk_cache=
+build:ci --remote_instance_name=foobartest
