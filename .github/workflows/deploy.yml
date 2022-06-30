@@ -1,0 +1,28 @@
+on: [push]
+
+jobs:
+  bazel_diff:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Fetch cache
+        uses: actions/cache@v1
+        with:
+          path: /home/runner/cache/
+          key: deploy-cache
+
+      - name: Install bazelisk
+        run: |
+          curl -LO "https://github.com/bazelbuild/bazelisk/releases/download/v1.12.0/bazelisk-linux-amd64"
+          mkdir -p $HOME/bin
+          mv bazelisk-linux-amd64 $HOME/bin/bazel
+          chmod +x $HOME/bin/bazel
+      
+      - name: Build bazel-diff
+        run: |
+          $HOME/bin/bazel build \
+              --config=ci \
+              @bazel_diff//:bazel-diff

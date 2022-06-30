@@ -1,0 +1,42 @@
+build --verbose_failures
+
+# Use a static PATH variable to prevent unnecessary rebuilds of dependencies like protobuf.
+build --incompatible_strict_action_env
+
+build --incompatible_remote_build_event_upload_respect_no_cache
+
+ # Upload logs and artifacts without writing to cache
+build --noremote_upload_local_results
+
+# All flags that impact language semantics must be listed as common,
+# otherwise non-build commands will cause repo fetch thrashing.
+# https://github.com/bazelbuild/bazel/issues/12689
+# https://github.com/bazelbuild/bazel/blob/release-5.2.0/src/main/java/com/google/devtools/build/lib/packages/semantics/BuildLanguageOptions.java
+common --experimental_repo_remote_exec
+
+build:cache --bes_results_url=https://app.buildbuddy.io/invocation/
+build:cache --bes_backend=grpcs://remote.buildbuddy.io
+build:cache --bes_timeout=5s
+build:cache --keep_backend_build_event_connections_alive=false
+build:cache --remote_cache=grpcs://remote.buildbuddy.io
+build:cache --remote_timeout=600
+build:cache --experimental_remote_cache_async
+
+build:rbe --jobs=200
+build:rbe --host_platform=@buildbuddy_toolchain//:platform
+build:rbe --platforms=@buildbuddy_toolchain//:platform
+build:rbe --crosstool_top=@buildbuddy_toolchain//:toolchain
+build:rbe --define=EXECUTOR=remote
+build:rbe --remote_download_toplevel
+
+build:remote --config=rbe
+build:remote --config=cache
+build:remote --remote_executor=grpcs://remote.buildbuddy.io
+
+# Configuration used for GitHub actions-based CI
+build:ci --config=remote
+build:ci --build_metadata=ROLE=CI
+build:ci --repository_cache=/home/runner/cache/bazel/
+build:ci --flaky_test_attempts=2
+build:ci --color=yes
+build:ci --disk_cache=
